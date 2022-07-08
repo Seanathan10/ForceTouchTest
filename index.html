@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Force Touch Test</title>
+
+  <style>
+
+    html {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+
+      background: linear-gradient( 45deg, lime, yellow );
+    }
+
+    .ForceClickBox {
+      width: 300px;
+      height: 300px;
+      padding: 0;
+      margin: 2em auto;
+      background: rgb( 0, 0, 255 );
+      border-radius: 3rem;
+
+      text-align: center;
+
+      transition: background 200ms ease-out;
+    }
+
+    .ForceClicked {
+      background: red;
+    }
+
+    .Text {
+      padding-top: 125px;
+
+      font-size: 2em;
+      color: white;
+    }
+
+  </style>
+
+
+</head>
+<body>
+
+  <div class="ForceClickBox" id="ForceBox">
+  
+      <p id="WrittenText" class="Text" >Force click here</p>
+  
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+  <script>
+    let UserAgent = navigator.userAgent;
+    let BrowserName;
+
+    if( UserAgent.match(/chrome|chromium|crios/i)){
+      BrowserName = "Chrome";
+    } else if( UserAgent.match(/firefox|fxios/i)){
+      BrowserName = "Firefox";
+    } else if( UserAgent.match(/safari/i)){
+      BrowserName = "Safari";
+    } else if( UserAgent.match(/opr\//i)){
+      BrowserName = "Opera";
+    } else if( UserAgent.match(/edg/i)){
+      BrowserName = "Edge";
+    } else{
+      BrowserName="[ Browser detection failed ]";
+    }
+
+    if( BrowserName != "Safari" ) {
+      alert( "This demo only works in the Safari browser. If you have a Force Touch capable Apple device, please switch to Safari for this page to function." );
+    }
+
+
+    var Box = document.querySelector( ".ForceClickBox" );
+
+    var ForceClickDown = function ForceClickDown( event ) {
+      event.preventDefault();
+
+      Box.className += " ForceClicked";
+
+      var ForceLevel = event[ "webkitForce" ];
+
+      // console.log( '[Click] Force Level is: ' + ForceLevel );
+    };
+
+    var ForceClickUp = function ForceClickUp( event ) {
+      event.preventDefault();
+
+      Box.className = "ForceClickBox";
+
+      var ForceLevel = event[ "webkitForce" ];
+
+      // console.log( '[No click] Force Level is: ' + ForceLevel );
+    };
+
+    var ForceChanged = function ForceChanged( event ) {
+      event.preventDefault();
+
+      var Timeout;
+      var Force = Math.round( event["webkitForce"]*100 ) / 100;
+
+      clearTimeout( Timeout );
+      Timeout = setTimeout( function() {
+        if( Force > 1 ) {
+          Box.style.transform = ( "scale( " + Force + " )" );
+        } else {
+          Box.style.transform = ( "scale( 1 )" );
+        }
+        // console.log( Force );
+        
+        if( Force === 0 ) {
+          document.getElementById( "WrittenText" ).innerHTML = "Force click here";
+        } else {
+          document.getElementById( "WrittenText" ).innerHTML = "Force: " + Force;
+        }
+
+      }, 300 );
+    }
+
+    Box.addEventListener( "webkitmouseforcedown", ForceClickDown, false );
+    Box.addEventListener( "webkitmouseforcechanged", ForceChanged, false );
+    Box.addEventListener( "webkitmouseforceup", ForceClickUp, false );
+
+  </script>
+</body>
+</html>
